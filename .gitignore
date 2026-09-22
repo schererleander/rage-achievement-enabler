@@ -1,0 +1,6 @@
+build/
+*.obj
+*.pdb
+*.dll
+*.asi
+CMakeUserPresets.json
