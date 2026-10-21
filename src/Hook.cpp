@@ -1,5 +1,7 @@
 #include "Hook.h"
 
+#include <cstring>
+
 #include "Logger.h"
 
 namespace RageAchievements {
@@ -77,6 +79,23 @@ bool InstallHook(uintptr_t address, HookCallback callback) {
     FlushInstructionCache(GetCurrentProcess(), target, 1);
     g_hook.armed = true;
     Log("RAGE Achievements: unlock hook armed at %p", target);
+    return true;
+}
+
+bool InstallJump(uintptr_t address, const void* target) {
+    unsigned char patch[14] = {0xFF, 0x25, 0x00, 0x00, 0x00, 0x00};
+    auto destination = reinterpret_cast<uintptr_t>(target);
+    std::memcpy(patch + 6, &destination, sizeof(destination));
+
+    auto* code = reinterpret_cast<void*>(address);
+    DWORD oldProtection = 0;
+    if (!VirtualProtect(code, sizeof(patch), PAGE_EXECUTE_READWRITE, &oldProtection)) {
+        Log("RAGE Achievements: VirtualProtect failed at %p (%lu)", code, GetLastError());
+        return false;
+    }
+    std::memcpy(code, patch, sizeof(patch));
+    VirtualProtect(code, sizeof(patch), oldProtection, &oldProtection);
+    FlushInstructionCache(GetCurrentProcess(), code, sizeof(patch));
     return true;
 }
 

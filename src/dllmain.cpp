@@ -5,6 +5,7 @@
 #include "Achievement.h"
 #include "GameReady.h"
 #include "Logger.h"
+#include "StubHandlers.h"
 
 namespace {
 
@@ -16,6 +17,9 @@ DWORD WINAPI WorkerThread(LPVOID) {
         auto base = reinterpret_cast<uintptr_t>(GetModuleHandleA(nullptr));
         if (!RageAchievements::InstallAchievementHook(base)) {
             RageAchievements::Log("RAGE Achievements: failed to install unlock hook");
+        }
+        if (!RageAchievements::InstallStubHandlers(base)) {
+            RageAchievements::Log("RAGE Achievements: failed to replace some achievement stubs");
         }
     }
     RageAchievements::FlushLog();

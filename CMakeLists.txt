@@ -16,6 +16,8 @@ add_library(Achievements SHARED
   src/Hook.h
   src/Logger.cpp
   src/Logger.h
+  src/StubHandlers.cpp
+  src/StubHandlers.h
 )
 
 target_compile_features(Achievements PRIVATE cxx_std_17)
